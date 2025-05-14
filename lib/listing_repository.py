@@ -20,6 +20,13 @@ class ListingRepository:
             )
         return None
     
+    def find_by_id(self, id):
+        rows = self._connection.execute(
+            'SELECT * FROM listings WHERE id = %s', [id]
+            )
+        row = rows[0]
+        return Listing(row['id'], row['name'], row['description'], row['price'], row['user_id'])
+    
     def find_by_user_id(self, user_id):
         rows = self._connection.execute(
             'SELECT * FROM listings WHERE user_id = %s', [user_id]
@@ -31,3 +38,18 @@ class ListingRepository:
                 )
             listings.append(item)
         return listings
+    
+    def update_listing(self, update):
+        self._connection.execute(
+            'UPDATE listings SET ' \
+            'name = %s, ' \
+            'description = %s, ' \
+            'price = %s ' \
+            'WHERE id = %s', [update.name, update.description, update.price, update.id]
+        )
+    
+    def delete_listing(self, id):
+        self._connection.execute(
+            'DELETE FROM listings WHERE id = %s', [id]
+        )
+
