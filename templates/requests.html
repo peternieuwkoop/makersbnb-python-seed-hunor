@@ -74,8 +74,19 @@
         margin-bottom: 20px;
         padding: 20px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        gap: 20px;
+    }
+
+    .listing-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .request-info {
+        flex-grow: 1;
     }
 
     .request-card h4 {
@@ -87,12 +98,14 @@
     .request-card p {
         color: #7f8c8d;
         font-size: 1.1em;
-        margin-bottom: 15px;
+        margin-bottom: 8px;
     }
 
     .request-actions {
         display: flex;
+        flex-direction: column;
         gap: 10px;
+        margin-left: 30px;
     }
 
     .request-actions button {
@@ -141,51 +154,63 @@
 </head>
 <body>
 
-    <header>
-        <div class="logo">
-            <h2>Makers BnB</h2>
-        </div>
-        <div class="nav-links">
-            <!-- Removed Listings link -->
-            <a href="/logout">Sign Out</a>
-        </div>
-    </header>
+<header>
+    <div class="logo">
+        <h2>Makers BnB</h2>
+    </div>
+    <div class="nav-links">
+        <a href="/logout">Sign Out</a>
+    </div>
+</header>
 
-    <section class="requests-section">
-        <a href="/listings" class="back-link">← Back to Listings</a>
+<section class="requests-section">
+    <a href="/listings" class="back-link">← Back to Listings</a>
 
-        <h2 class="section-title">Incoming Requests</h2>
-        <div class="requests-container">
-            {% for request in incoming_requests %}
-            <div class="request-card">
-                <div class="request-info">
-                    <h4>{{ request.user_name }}</h4>
-                    <p>{{ request.details }}</p>
-                </div>
-                <div class="request-actions">
-                    <button class="accept-btn">Accept</button>
-                    <button class="decline-btn">Decline</button>
-                </div>
+    <h2 class="section-title">Incoming Requests</h2>
+    <div class="requests-container">
+    {% for request in incoming_requests %}
+    <div class="request-card" id="request-{{ request.id }}">
+        <img src="{{ url_for('static', filename='uploads/' + request.listing_image) }}" alt="Listing Image" class="listing-image" />
+        <div class="request-info">
+            <p><strong>Listing Name:</strong> {{ request.listing_name }}</p>
+            <p><strong>Start Date:</strong> {{ request.start_date }}</p>
+            <p><strong>End Date:</strong> {{ request.end_date }}</p>
+        </div>
+        <div class="request-actions">
+            <!-- Accept button, POST with DELETE override -->
+            <form action="{{ url_for('decline_request', request_id=request.id) }}" method="POST" style="display:inline;">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="accept-btn">Accept</button>
+            </form>
+            
+            <!-- Decline button, POST with DELETE override -->
+            <form action="{{ url_for('decline_request', request_id=request.id) }}" method="POST" style="display:inline;">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="decline-btn">Decline</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+        <p>No requests found.</p>
+    {% endfor %}
+    </div>
+
+    <h2 class="section-title">Requests Sent</h2>
+    <div class="requests-container">
+        {% for request in outgoing_requests %}
+        <div class="request-card">
+            <img src="{{ url_for('static', filename='uploads/' + request.listing_image) }}" alt="Listing Image" class="listing-image" />
+            <div class="request-info">
+                <p><strong>Listing Name:</strong> {{ request.listing_name }}</p>
+                <p><strong>Start Date:</strong> {{ request.start_date }}</p>
+                <p><strong>End Date:</strong> {{ request.end_date }}</p>
             </div>
-            {% else %}
-            <p>No incoming requests found.</p>
-            {% endfor %}
         </div>
-
-        <h2 class="section-title">Requests Sent</h2>
-        <div class="requests-container">
-            {% for request in outgoing_requests %}
-            <div class="request-card">
-                <div class="request-info">
-                    <h4>{{ request.user_name }}</h4>
-                    <p>{{ request.details }}</p>
-                </div>
-            </div>
-            {% else %}
+        {% else %}
             <p>No sent requests found.</p>
-            {% endfor %}
-        </div>
-    </section>
+        {% endfor %}
+    </div>
+</section>
 
 </body>
 </html>

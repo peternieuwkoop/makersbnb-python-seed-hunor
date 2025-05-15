@@ -1,5 +1,6 @@
 from lib.listing import Listing
 from datetime import datetime, timedelta
+from lib.request import Request
 
 
 class ListingRepository:
@@ -86,15 +87,76 @@ class ListingRepository:
             INSERT INTO bookings (listing_id, start_date, end_date, user_id)
             VALUES (%s, %s, %s, %s)
         """, [listing_id, start_date, end_date, user_id])
-    
         return True
     
     def create_booking_request(self, listing_id, start_date, end_date, user_id):
         self._connection.execute("""
-            INSERT INTO requests (listing_id, requester_id, start_date, end_date)
+            INSERT INTO requests (listing_id, start_date, end_date, user_id)
             VALUES (%s, %s, %s, %s)
         """, [listing_id, start_date, end_date, user_id])
         return True
+    
+
+    def find_outgoing_requests(self, user_id):
+        rows = self._connection.execute(
+            '''
+            SELECT 
+                r.id AS request_id,
+                r.listing_id,
+                r.start_date,
+                r.end_date,
+                l.name AS listing_name,
+                l.image AS listing_image
+            FROM requests r
+            JOIN listings l ON r.listing_id = l.id
+            WHERE r.user_id = %s
+            ''',
+            [user_id]
+        )
+        requests = []
+        for row in rows:
+            item = {
+                'id': row['request_id'],
+                'listing_id': row['listing_id'],
+                'start_date': row['start_date'],
+                'end_date': row['end_date'],
+                'listing_name': row['listing_name'],
+                'listing_image': row['listing_image']
+            }
+            requests.append(item)
+        return requests
+
+    def find_incoming_requests(self, owner_user_id):
+        rows = self._connection.execute(
+            '''
+            SELECT 
+                r.id AS request_id,
+                r.listing_id,
+                r.user_id AS requester_id,
+                r.start_date,
+                r.end_date,
+                l.name AS listing_name,
+                l.image AS listing_image
+            FROM requests r
+            JOIN listings l ON r.listing_id = l.id
+            WHERE l.user_id = %s
+            ''',
+            [owner_user_id]
+        )
+        requests = []
+        for row in rows:
+            item = {
+                'id': row['request_id'],
+                'listing_id': row['listing_id'],
+                'requester_id': row['requester_id'],
+                'start_date': row['start_date'],
+                'end_date': row['end_date'],
+                'listing_name': row['listing_name'],
+                'listing_image': row['listing_image']
+            }
+            requests.append(item)
+
+        return requests
     
     def update_listing(self, update):
         self._connection.execute(
@@ -109,3 +171,12 @@ class ListingRepository:
         self._connection.execute(
             'DELETE FROM listings WHERE id = %s', [id]
         )
+
+    def delete_request(self, id):
+        self._connection.execute(
+            'DELETE FROM requests WHERE id = %s', [id]
+        )
+
+
+    
+    

@@ -75,7 +75,37 @@ def create_listing():
 
 @app.route('/requests', methods=['GET'])
 def get_requests():
-    return render_template('requests.html')
+    user_id = session['user_id']
+    owner_user_id = session['user_id']
+    connection = get_flask_database_connection(app)
+    repository = ListingRepository(connection)
+    outgoing_requests = repository.find_outgoing_requests(user_id)
+    incoming_requests = repository.find_incoming_requests(owner_user_id)
+    return render_template('requests.html', outgoing_requests=outgoing_requests, incoming_requests=incoming_requests)
+
+@app.route('/requests/<int:request_id>/decline', methods=['POST'])
+def decline_request(request_id):
+    if request.method == 'POST' and request.form.get('_method') == 'DELETE':
+        # Add logic to handle the decline (delete) request here
+        user_id = session['user_id']
+        connection = get_flask_database_connection(app)
+        repository = ListingRepository(connection)
+        repository.delete_request(request_id)  # This should delete the request from the database
+        return redirect(url_for('get_requests'))  # Redirect back to the requests page
+    
+    return redirect(url_for('get_requests'))
+
+# @app.route('/requests/<int:request_id>/accept', methods=['POST'])
+# def decline_request(request_id):
+#     if request.method == 'POST' and request.form.get('_method') == 'POST':
+#         # Add logic to handle the decline (delete) request here
+#         user_id = session['user_id']
+#         connection = get_flask_database_connection(app)
+#         repository = ListingRepository(connection)
+#         repository.delete_request(request_id)  # This should delete the request from the database
+#         return redirect(url_for('get_requests'))  # Redirect back to the requests page
+    
+#     return redirect(url_for('get_requests'))
 
 
 @app.route('/listing/<int:listing_id>', methods=['GET'])
@@ -103,7 +133,7 @@ def book_listing():
         flash("Invalid date format.")
         return redirect(f"/listing/{listing_id}")
     repo = ListingRepository(get_flask_database_connection(app))
-    if not repo.create_booking(listing_id, start_date, end_date, user_id):
+    if not repo.create_booking_request(listing_id, start_date, end_date, user_id):
         flash("Those dates are already booked.")
     else:
         flash("Booking successful!")

@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS requests;
+DROP SEQUENCE IF EXISTS requests_id_seq;
+
 DROP TABLE IF EXISTS bookings;
 DROP SEQUENCE IF EXISTS bookings_id_seq;
 
@@ -22,6 +25,15 @@ CREATE TABLE listings (
     description TEXT,
     price int,
     image TEXT,
+    user_id int
+);
+
+
+CREATE TABLE requests (
+    id SERIAL PRIMARY KEY,
+    listing_id INT REFERENCES listings(id) ON DELETE CASCADE,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
     user_id int
 );
 
