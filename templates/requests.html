@@ -178,7 +178,7 @@
         </div>
         <div class="request-actions">
             <!-- Accept button, POST with DELETE override -->
-            <form action="{{ url_for('decline_request', request_id=request.id) }}" method="POST" style="display:inline;">
+            <form action="{{ url_for('accept_request', request_id=request.id) }}" method="POST" style="display:inline;">
                 <input type="hidden" name="_method" value="DELETE">
                 <button type="submit" class="accept-btn">Accept</button>
             </form>

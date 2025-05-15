@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Makers BnB | Listings</title>
+    <title>Your Listings | Makers BnB</title>
     <style>
     * {
         margin: 0;
@@ -103,12 +103,16 @@
     }
 
     .listings-container {
-        width: 100%;
-        max-width: 1200px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 40px;
-    }
+    width: 100%;
+    max-width: 600px; /* 50% smaller than 1200px */
+   /* Optional: centers it */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Or adjust as needed */
+    gap: 40px;
+
+
+}
+    
 
     .listing-card {
         background-color: #ffffff;
@@ -116,7 +120,6 @@
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         overflow: hidden;
         transition: transform 0.3s;
-        cursor: pointer;
         text-decoration: none;
         color: inherit;
     }
@@ -124,15 +127,24 @@
     .listing-card:hover {
         transform: translateY(-10px);
     }
-
     .listing-card img {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
-    }
+    width: 100%;            /* Makes the image fill the full width of the container */
+    height: auto;           /* Optional: lets the height adjust proportionally */
+    object-fit: cover;      /* Ensures image fills space without squishing */
+    display: block;
+    border-radius: 8px;
+
+
+
+}
+
+
+
+    
 
     .listing-card .info {
         padding: 25px;
+        
     }
 
     .listing-card h4 {
@@ -152,25 +164,42 @@
         font-size: 1.3em;
         font-weight: 600;
     }
+
+    .delete-button {
+        background-color: #e74c3c;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+    .delete-button:hover {
+        background-color: #c0392b;
+    }
+
     </style>
 </head>
 <body>
 
-    <header>
+<header>
     <div class="logo">
         <h2>Makers BnB</h2>
     </div>
     <div class="nav-links">
-        <a href="/my-listings">My Listings</a>
+        <a href="/listings">All Listings</a>
         <a href="/requests">Requests</a>
         <a href="/logout">Sign Out</a>
     </div>
-    </header>
+</header>
 
-    <section class="hero">
+<section class="hero">
     <div class="intro-text">
-        <h1>Book your stay!</h1>
-        <p>Discover cozy homes, unique stays, and unforgettable experiences — all hosted by local experts who care. Your next adventure begins right here at Makers BnB.</p>
+        <h1>Your Property Listings</h1>
+        <p>These are the listings you've created on Makers BnB.</p>
     </div>
 
     <div class="add-listing-button">
@@ -179,19 +208,23 @@
 
     <div class="listings-container">
         {% for listing in listings %}
-        <a href="/find/{{ listing.id }}" class="listing-card">
-        <img src="{{ url_for('static', filename='uploads/' + listing.image) }}" alt="{{ listing.name }}" />
-        <div class="info">
-            <h4>{{ listing.name }}</h4>
-            <p>{{ listing.description }}</p>
-            <span class="price">£{{ listing.price }} / night</span>
+        <div class="listing-card">
+            <img src="{{ url_for('static', filename='uploads/' + listing.image) }}" alt="{{ listing.name }}" />
+            <div class="info">
+                <h4>{{ listing.name }}</h4>
+                <p>{{ listing.description }}</p>
+                <span class="price">£{{ listing.price }} / night</span>
+                
+                <form action="/delete-listing/{{ listing.id }}" method="POST">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+            </div>
         </div>
-        </a>
         {% else %}
-        <p>No listings found.</p>
+        <p style="color: white; font-size: 1.2em; margin-top: 20px;">You don't have any listings yet.</p>
         {% endfor %}
     </div>
-    </section>
+</section>
 
 </body>
 </html>

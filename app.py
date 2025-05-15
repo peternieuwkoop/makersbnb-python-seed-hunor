@@ -1,5 +1,6 @@
 import os
 from flask import Flask, request, render_template, redirect, url_for, flash, session
+from flask_mail import Mail, Message
 from lib.database_connection import get_flask_database_connection
 from lib.listing_repository import ListingRepository 
 from lib.listing import Listing
@@ -11,9 +12,19 @@ from lib.user_repository import UserRepository
 from lib.user import User
 import bcrypt
 
+
 # Create a new Flask app
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
+# Mail configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'psyopmakers@gmail.com'
+app.config['MAIL_PASSWORD'] = 'kivurpvivalxnrns'
+app.config['MAIL_DEFAULT_SENDER'] = 'psyopmakers@gmail.com'
+mail = Mail(app)
+
 # == Your Routes Here ==
 
 # GET /index
@@ -95,17 +106,30 @@ def decline_request(request_id):
     
     return redirect(url_for('get_requests'))
 
-# @app.route('/requests/<int:request_id>/accept', methods=['POST'])
-# def decline_request(request_id):
-#     if request.method == 'POST' and request.form.get('_method') == 'POST':
-#         # Add logic to handle the decline (delete) request here
-#         user_id = session['user_id']
-#         connection = get_flask_database_connection(app)
-#         repository = ListingRepository(connection)
-#         repository.delete_request(request_id)  # This should delete the request from the database
-#         return redirect(url_for('get_requests'))  # Redirect back to the requests page
+@app.route('/requests/<int:request_id>/accept', methods=['POST'])
+def accept_request(request_id):
+    if request.method == 'POST' and request.form.get('_method') == 'DELETE':
+        # Add logic to handle the decline (delete) request here
+        user_id = session['user_id']
+        connection = get_flask_database_connection(app)
+        repository = ListingRepository(connection)
+        request_data = connection.execute("""
+            SELECT listing_id, start_date, end_date, user_id
+            FROM requests
+            WHERE id = %s
+        """, [request_id])
+        if not request_data:
+            flash("Those dates are already booked.")
+            return redirect(url_for('get_requests'))
+        listing_id = request_data[0]['listing_id']
+        start_date = request_data[0]['start_date']
+        end_date = request_data[0]['end_date']
+        guest_id = request_data[0]['user_id']
+        repository.create_booking(listing_id, start_date, end_date, guest_id)
+        repository.delete_request(request_id)  # This should delete the request from the database
+        return redirect(url_for('get_requests'))  # Redirect back to the requests page
     
-#     return redirect(url_for('get_requests'))
+    return redirect(url_for('get_requests'))
 
 
 @app.route('/listing/<int:listing_id>', methods=['GET'])
@@ -136,7 +160,7 @@ def book_listing():
     if not repo.create_booking_request(listing_id, start_date, end_date, user_id):
         flash("Those dates are already booked.")
     else:
-        flash("Booking successful!")
+        flash("Booking request sent!")
     return redirect(f"/listing/{listing_id}")
 
 
@@ -164,6 +188,14 @@ def signup():
     repo = UserRepository(connection)
     repo.create(user)
     flash("Account created successfully! Please log in.", "success")
+    # email confirmation
+    msg = Message("Signup Confirmation", recipients=[email])
+    msg.html = f"""
+    <h2>Thank you for signing up!</h2>
+    <p>This is a confirmation email to show that you have correctly signed up for Makers BNB. We hope you are looking forward to your first stay.</p>
+    """
+    mail.send(msg)
+    flash("An email has been sent to your account.")
     return redirect('/login')  # Redirect to login page after successful registration
     
     
@@ -205,6 +237,35 @@ def logout():
     session.clear()  # Clear the session
     flash("You have been logged out.", "info")
     return redirect(url_for('login'))
+
+@app.route('/my-listings')
+def my_listings():
+    if 'user_id' not in session:
+        return redirect('/login')  # ensure the user is logged in
+
+    connection = get_flask_database_connection(app)
+    repository = ListingRepository(connection)
+
+    # Only fetch listings created by the logged-in user
+    user_id = session['user_id']
+    listings = repository.find_by_user_id(user_id)
+
+    return render_template('view_user_listings.html', listings=listings)
+
+@app.route('/delete-listing/<int:id>', methods=['POST'])
+def delete_listing(id):
+    if 'user_id' not in session:
+        return redirect('/login')  # Ensure the user is logged in
+
+    connection = get_flask_database_connection(app)
+    repository = ListingRepository(connection)
+
+    listing = repository.find_by_id(id)
+
+    if listing and listing.user_id == session['user_id']:
+        repository.delete_listing(id)  # Only delete if the listing belongs to the logged-in user
+
+    return redirect('/my-listings')  # Redirect back to the user's listings page
 
 
 

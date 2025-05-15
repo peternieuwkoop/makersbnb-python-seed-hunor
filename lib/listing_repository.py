@@ -80,7 +80,7 @@ class ListingRepository:
         """, [listing_id, start_date, start_date, end_date, end_date, start_date, end_date])
     
     # If rows is not empty, it means there is a booking conflict
-        if rows:
+        if len(rows) > 0:
             return False
 
         self._connection.execute("""
