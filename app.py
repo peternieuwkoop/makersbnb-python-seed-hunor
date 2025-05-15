@@ -176,6 +176,36 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for('login'))
 
+@app.route('/my-listings')
+def my_listings():
+    if 'user_id' not in session:
+        return redirect('/login')  # ensure the user is logged in
+
+    connection = get_flask_database_connection(app)
+    repository = ListingRepository(connection)
+
+    # Only fetch listings created by the logged-in user
+    user_id = session['user_id']
+    listings = repository.find_by_user_id(user_id)
+
+    return render_template('view_user_listings.html', listings=listings)
+
+@app.route('/delete-listing/<int:id>', methods=['POST'])
+def delete_listing(id):
+    if 'user_id' not in session:
+        return redirect('/login')  # Ensure the user is logged in
+
+    connection = get_flask_database_connection(app)
+    repository = ListingRepository(connection)
+
+    listing = repository.find_by_id(id)
+
+    if listing and listing.user_id == session['user_id']:
+        repository.delete_listing(id)  # Only delete if the listing belongs to the logged-in user
+
+    return redirect('/my-listings')  # Redirect back to the user's listings page
+
+
 
 
 
