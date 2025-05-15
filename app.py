@@ -267,7 +267,15 @@ def delete_listing(id):
 
     return redirect('/my-listings')  # Redirect back to the user's listings page
 
-
+@app.route('/bookings', methods=['GET'])
+def get_bookings():
+    user_id = session['user_id']
+    owner_user_id = session['user_id']
+    connection = get_flask_database_connection(app)
+    repository = ListingRepository(connection)
+    outgoing_bookings = repository.find_outgoing_bookings(user_id)
+    incoming_bookings = repository.find_incoming_bookings(owner_user_id)
+    return render_template('bookings.html', outgoing_bookings=outgoing_bookings, incoming_bookings=incoming_bookings)
 
 
 # These lines start the server if you run this file directly

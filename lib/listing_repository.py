@@ -178,5 +178,63 @@ class ListingRepository:
         )
 
 
+    def find_incoming_bookings(self, owner_user_id):
+        rows = self._connection.execute(
+            '''
+            SELECT 
+                b.id AS booking_id,
+                b.listing_id,
+                b.user_id AS requester_id,
+                b.start_date,
+                b.end_date,
+                l.name AS listing_name,
+                l.image AS listing_image
+            FROM bookings b
+            JOIN listings l ON b.listing_id = l.id
+            WHERE l.user_id = %s
+            ''',
+            [owner_user_id]
+        )
+        bookings = []
+        for row in rows:
+            item = {
+                'id': row['booking_id'],
+                'listing_id': row['listing_id'],
+                'requester_id': row['requester_id'],
+                'start_date': row['start_date'],
+                'end_date': row['end_date'],
+                'listing_name': row['listing_name'],
+                'listing_image': row['listing_image']
+            }
+            bookings.append(item)
+
+        return bookings
     
-    
+    def find_outgoing_bookings(self, user_id):
+        rows = self._connection.execute(
+            '''
+            SELECT 
+                b.id AS booking_id,
+                b.listing_id,
+                b.start_date,
+                b.end_date,
+                l.name AS listing_name,
+                l.image AS listing_image
+            FROM bookings b
+            JOIN listings l ON b.listing_id = l.id
+            WHERE b.user_id = %s
+            ''',
+            [user_id]
+        )
+        bookings = []
+        for row in rows:
+            item = {
+                'id': row['booking_id'],
+                'listing_id': row['listing_id'],
+                'start_date': row['start_date'],
+                'end_date': row['end_date'],
+                'listing_name': row['listing_name'],
+                'listing_image': row['listing_image']
+            }
+            bookings.append(item)
+        return bookings
