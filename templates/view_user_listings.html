@@ -241,8 +241,9 @@
                     <form action="/delete-listing/{{ listing.id }}" method="POST">
                         <button type="submit" class="delete-button">Delete</button>
                     </form>
-                    <form action="/edit-listing/{{ listing.id }}" method="POST">
-                        <button type="submit" class="update-button">Edit</button>
+                    <a href="/edit-listing/{{ listing.id }}" class="update-button-link">
+                    <button type="button" class="update-button">Edit</button>
+                    </a>
                     </form>
                 </div>   
             </div>

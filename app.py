@@ -306,38 +306,38 @@ def delete_listing(id):
 
     return redirect('/my-listings')  # Redirect back to the user's listings page
 
-# @app.route('/edit-listing/<int:id>', methods=['GET'])
-# def edit_listing(id):
-#     if 'user_id' not in session:
-#         return redirect('/login')
-#     connection = get_flask_database_connection(app)
-#     repository = ListingRepository(connection)
-#     listing = repository.find_by_id(id)
-#     if listing and listing.user_id == session['user_id']:
-#         return render_template('update-listing.html', listing=listing)
-#     return redirect('/my-listings')
+@app.route('/edit-listing/<int:id>', methods=['GET'])
+def edit_listing(id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    connection = get_flask_database_connection(app)
+    repository = ListingRepository(connection)
+    listing = repository.find_by_id(id)
+    if listing and listing.user_id == session['user_id']:
+        return render_template('update-listing.html', listing=listing)
+    return redirect('/my-listings')
 
-# @app.route('/update-listing/<int:id>', methods=['POST'])
-# def update_listing(id):
-#     if 'user_id' not in session:
-#         return redirect('/login')
-#     connection = get_flask_database_connection(app)
-#     repository = ListingRepository(connection)
-#     listing = repository.find_by_id(id)
-#     if listing and listing.user_id == session['user_id']:
-#         name = request.form.get('name')
-#         description = request.form.get('description')
-#         price = request.form.get('price')
-#         image = request.files.get('image')
-#         user_id = session['user_id']
-#         filename = listing.image  # Keep old image by default
-#         if image and image.filename:
-#             filename = secure_filename(image.filename)
-#             upload_path = os.path.join(app.static_folder, 'uploads', filename)
-#             image.save(upload_path)
-#         updated_listing = Listing(id=id, name=name, description=description, price=price, image=filename, user_id=user_id)
-#         repository.update_listing(updated_listing)
-#     return redirect('/my-listings')
+@app.route('/update-listing/<int:id>', methods=['POST'])
+def update_listing(id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    connection = get_flask_database_connection(app)
+    repository = ListingRepository(connection)
+    listing = repository.find_by_id(id)
+    if listing and listing.user_id == session['user_id']:
+        name = request.form.get('name')
+        description = request.form.get('description')
+        price = request.form.get('price')
+        image = request.files.get('image')
+        user_id = session['user_id']
+        filename = listing.image  # Keep old image by default
+        if image and image.filename:
+            filename = secure_filename(image.filename)
+            upload_path = os.path.join(app.static_folder, 'uploads', filename)
+            image.save(upload_path)
+        updated_listing = Listing(id=id, name=name, description=description, price=price, image=filename, user_id=user_id)
+        repository.update_listing(updated_listing)
+    return redirect('/my-listings')
 
 @app.route('/bookings', methods=['GET'])
 def get_bookings():
