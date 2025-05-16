@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Makers BnB | Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        header {
+            background: linear-gradient(to right, #2c3e50, #34495e);
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo h2 {
+            color: #fff;
+            font-size: 1.8em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: 500;
+            padding: 10px 20px;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #fff;
+            color: #2c3e50;
+        }
+
+        .hero {
+            height: calc(100vh - 80px); /* header height */
+            background-image: url('../../static/images/blurcabinhome.jpeg'); /* Use original image */
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding-top: 20px; /* Add padding to create space for the flash message */
+        }
+
+        .login-form {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-form h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        .login-form input[type="text"],
+        .login-form input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .login-form button:hover {
+            background-color: #1a252f;
+        }
+
+        .flash-messages {
+            position: absolute;
+            top: 20px;  /* Adjust the distance from the top of the hero section */
+            left: 20px; /* Adjust the distance from the left side */
+            background-color: rgba(255, 255, 255, 0.7); /* Optional: Add a slight background to make the text more readable */
+            color: red;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 3; /* Make sure it sits above the background */
+            width: auto; /* Let it adjust based on the message width */
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+    <div class="logo">
+        <h2>Makers BnB</h2>
+    </div>
+    <div class="nav-links">
+        <a href="/signup">Sign Up</a>
+        <a href="/home">Home</a>
+    </div>
+    </header>
+
+    <section class="hero">
+        <!-- Flash messages section -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        
+        <form class="login-form" method="POST" action="{{ url_for('login') }}">
+            <h3>Login to Your Account</h3>
+            <!-- Updated input names to match the form data expected by Flask -->
+            <input type="text" name="email" placeholder="Email" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <button type="submit">Log In</button>
+        </form>
+    </section>
+
+</body>
+</html>
