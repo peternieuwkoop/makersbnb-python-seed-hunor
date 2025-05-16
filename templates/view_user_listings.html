@@ -173,21 +173,34 @@
         font-weight: 600;
     }
 
-    .delete-button {
-        background-color: #e74c3c;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        margin-top: 10px;
-        transition: background-color 0.3s ease;
-    }
+    .button-group {
+    display: flex;
+    gap: 110px; /* Space between buttons */
+    margin-top: 10px;
+}
 
-    .delete-button:hover {
-        background-color: #c0392b;
-    }
+    .delete-button, .update-button {
+    background-color: #e74c3c; /* override for delete only */
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.update-button {
+    background-color: #2c3e50;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+}
+
+.update-button:hover {
+    background-color: #34495e;
+}
 
     </style>
 </head>
@@ -224,10 +237,14 @@
                 <h4>{{ listing.name }}</h4>
                 <p>{{ listing.description }}</p>
                 <span class="price">£{{ listing.price }} / night</span>
-                
-                <form action="/delete-listing/{{ listing.id }}" method="POST">
-                    <button type="submit" class="delete-button">Delete</button>
-                </form>
+                <div class="button-group">
+                    <form action="/delete-listing/{{ listing.id }}" method="POST">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                    <form action="/edit-listing/{{ listing.id }}" method="POST">
+                        <button type="submit" class="update-button">Edit</button>
+                    </form>
+                </div>   
             </div>
         </div>
         {% else %}

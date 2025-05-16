@@ -82,7 +82,21 @@ def create_listing():
         repository = ListingRepository(connection)
         listing = Listing(id=None, name=name, description=description, price=price, image=filename, user_id=user_id)
         repository.create_listing(listing)
+        email_list = connection.execute("""
+            SELECT email
+            FROM users
+            WHERE id = %s
+        """, [user_id])
+        email = email_list[0]['email']
+        msg = Message("Listing Confirmation", recipients=[email])
+        msg.html = f"""
+        <h2>New property listing has been received!</h2>
+        <p>This is a confirmation email to show that you have successfully listed your property. We hope you are looking forward to your first guests.</p>
+        """
+        mail.send(msg)
+        flash("An email has been sent to your account.")
         return redirect(url_for('get_all_listings'))
+
 
 @app.route('/requests', methods=['GET'])
 def get_requests():
@@ -126,6 +140,18 @@ def accept_request(request_id):
         end_date = request_data[0]['end_date']
         guest_id = request_data[0]['user_id']
         repository.create_booking(listing_id, start_date, end_date, guest_id)
+        email_list = connection.execute("""
+            SELECT email
+            FROM users
+            WHERE id = %s
+        """, [user_id])
+        email = email_list[0]['email']
+        msg = Message("Booking Request Confirmation", recipients=[email])
+        msg.html = f"""
+        <h2>Booking request has been accepted!</h2>
+        <p>This is a confirmation email to show that you have accepted a guests booking request at one of your properties.</p>
+        """
+        mail.send(msg)
         repository.delete_request(request_id)  # This should delete the request from the database
         return redirect(url_for('get_requests'))  # Redirect back to the requests page
     
@@ -156,11 +182,24 @@ def book_listing():
     except ValueError:
         flash("Invalid date format.")
         return redirect(f"/listing/{listing_id}")
-    repo = ListingRepository(get_flask_database_connection(app))
+    connection = get_flask_database_connection(app)
+    repo = ListingRepository(connection)
     if not repo.create_booking_request(listing_id, start_date, end_date, user_id):
         flash("Those dates are already booked.")
     else:
         flash("Booking request sent!")
+        email_list = connection.execute("""
+            SELECT email
+            FROM users
+            WHERE id = %s
+        """, [user_id])
+        email = email_list[0]['email']
+        msg = Message("Booking Request Received", recipients=[email])
+        msg.html = f"""
+        <h2>New booking request has been received!</h2>
+        <p>This is a confirmation email to show that you have successfully sent a booking request. The host will review shortly.</p>
+        """
+        mail.send(msg)
     return redirect(f"/listing/{listing_id}")
 
 
@@ -195,7 +234,7 @@ def signup():
     <p>This is a confirmation email to show that you have correctly signed up for Makers BNB. We hope you are looking forward to your first stay.</p>
     """
     mail.send(msg)
-    flash("An email has been sent to your account.")
+    flash(f"An email has been sent to your account: {email}.")
     return redirect('/login')  # Redirect to login page after successful registration
     
     
@@ -266,6 +305,39 @@ def delete_listing(id):
         repository.delete_listing(id)  # Only delete if the listing belongs to the logged-in user
 
     return redirect('/my-listings')  # Redirect back to the user's listings page
+
+# @app.route('/edit-listing/<int:id>', methods=['GET'])
+# def edit_listing(id):
+#     if 'user_id' not in session:
+#         return redirect('/login')
+#     connection = get_flask_database_connection(app)
+#     repository = ListingRepository(connection)
+#     listing = repository.find_by_id(id)
+#     if listing and listing.user_id == session['user_id']:
+#         return render_template('update-listing.html', listing=listing)
+#     return redirect('/my-listings')
+
+# @app.route('/update-listing/<int:id>', methods=['POST'])
+# def update_listing(id):
+#     if 'user_id' not in session:
+#         return redirect('/login')
+#     connection = get_flask_database_connection(app)
+#     repository = ListingRepository(connection)
+#     listing = repository.find_by_id(id)
+#     if listing and listing.user_id == session['user_id']:
+#         name = request.form.get('name')
+#         description = request.form.get('description')
+#         price = request.form.get('price')
+#         image = request.files.get('image')
+#         user_id = session['user_id']
+#         filename = listing.image  # Keep old image by default
+#         if image and image.filename:
+#             filename = secure_filename(image.filename)
+#             upload_path = os.path.join(app.static_folder, 'uploads', filename)
+#             image.save(upload_path)
+#         updated_listing = Listing(id=id, name=name, description=description, price=price, image=filename, user_id=user_id)
+#         repository.update_listing(updated_listing)
+#     return redirect('/my-listings')
 
 @app.route('/bookings', methods=['GET'])
 def get_bookings():

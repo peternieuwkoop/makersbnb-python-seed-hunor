@@ -163,8 +163,10 @@ class ListingRepository:
             'UPDATE listings SET ' \
             'name = %s, ' \
             'description = %s, ' \
-            'price = %s ' \
-            'WHERE id = %s', [update.name, update.description, update.price, update.id]
+            'price = %s, ' \
+            'image = %s, ' \
+            'user_id = %s ' \
+            'WHERE id = %s', [update.name, update.description, update.price, update.image, update.user_id, update.id]
         )
     
     def delete_listing(self, id):
