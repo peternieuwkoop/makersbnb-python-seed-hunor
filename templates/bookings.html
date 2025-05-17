@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Makers BnB | Bookings</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-image: url('../../static/images/beach.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    header {
+        background: linear-gradient(to right, #2c3e50, #34495e);
+        padding: 30px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .logo h2 {
+        color: #fff;
+        font-size: 1.8em;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 20px;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: #fff;
+        font-weight: 500;
+        padding: 10px 20px;
+        border: 1px solid #fff;
+        border-radius: 5px;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .nav-links a:hover {
+        background-color: #fff;
+        color: #2c3e50;
+    }
+
+    .section-title {
+        text-align: center;
+        margin: 50px 0 30px;
+        font-size: 2.5em;
+        color: #2c3e50;
+    }
+
+    .requests-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .request-card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .listing-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .request-info {
+        flex-grow: 1;
+    }
+
+    .request-card h4 {
+        color: #2c3e50;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+
+    .request-card p {
+        color: #7f8c8d;
+        font-size: 1.1em;
+        margin-bottom: 8px;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin: 30px 0 0 40px;
+        padding: 10px 20px;
+        background-color: #2c3e50;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: 500;
+        transition: background 0.3s ease;
+    }
+
+    .back-link:hover {
+        background-color: #34495e;
+    }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <h2>Makers BnB</h2>
+    </div>
+    <div class="nav-links">
+        <a href="/my-listings">My Listings</a>
+        <a href="/requests">Requests</a>
+        <a href="/logout">Sign Out</a>
+    </div>
+</header>
+
+<section class="requests-section">
+    <a href="/listings" class="back-link">← Back to Listings</a>
+
+    <h2 class="section-title">Incoming Bookings</h2>
+    <div class="requests-container">
+        {% for booking in incoming_bookings %}
+        <div class="request-card" id="booking-{{ booking.id }}">
+            <img src="{{ url_for('static', filename='uploads/' + booking.listing_image) }}" alt="Listing Image" class="listing-image" />
+            <div class="request-info">
+                <h4>{{ booking.listing_name }}</h4>
+                <p><strong>Guest:</strong> {{ booking.guest_name }}</p>
+                <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
+                <p><strong>End Date:</strong> {{ booking.end_date }}</p>
+            </div>
+        </div>
+        {% else %}
+            <p>No incoming bookings found.</p>
+        {% endfor %}
+    </div>
+
+    <h2 class="section-title">Outgoing Bookings</h2>
+    <div class="requests-container">
+        {% for booking in outgoing_bookings %}
+        <div class="request-card" id="booking-{{ booking.id }}">
+            <img src="{{ url_for('static', filename='uploads/' + booking.listing_image) }}" alt="Listing Image" class="listing-image" />
+            <div class="request-info">
+                <h4>{{ booking.listing_name }}</h4>
+                <p><strong>Host:</strong> {{ booking.host_name }}</p>
+                <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
+                <p><strong>End Date:</strong> {{ booking.end_date }}</p>
+            </div>
+        </div>
+        {% else %}
+            <p>No outgoing bookings found.</p>
+        {% endfor %}
+    </div>
+</section>
+
+</body>
+</html>

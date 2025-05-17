@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Makers BnB | Your Listings</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    header {
+        background: linear-gradient(to right, #2c3e50, #34495e);
+        padding: 30px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .logo h2 {
+        color: #fff;
+        font-size: 1.8em;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 20px;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: #fff;
+        font-weight: 500;
+        padding: 10px 20px;
+        border: 1px solid #fff;
+        border-radius: 5px;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .nav-links a:hover {
+        background-color: #fff;
+        color: #2c3e50;
+    }
+
+    .hero {
+        min-height: calc(100vh - 80px);
+        background-image: url('../../static/images/beach.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+        justify-content: flex-start; /* Align content to the top */
+        position: relative;
+    }
+
+    .hero > .back-link {
+        align-self: flex-start; /* This moves the back-link to the left */
+        display: inline-block;
+        margin: 30px 0 0 40px;
+        padding: 10px 20px;
+        background-color: #2c3e50;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: 500;
+        transition: background 0.3s ease;
+    }
+
+    .back-link:hover {
+        background-color: #34495e;
+    }
+
+    .intro-text {
+        margin-bottom: 40px;
+        text-align: center;
+        color: #fff;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .intro-text h1 {
+        font-size: 2.8em;
+        font-weight: 600;
+        color: #fff;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        margin-bottom: 15px;
+    }
+
+    .intro-text p {
+        font-size: 1.2em;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .add-listing-button {
+        margin-bottom: 60px;
+    }
+
+    .add-listing-button a {
+        text-decoration: none;
+        background-color: #2c3e50;
+        color: #fff;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+    .add-listing-button a:hover {
+        background-color: #34495e;
+    }
+
+    .listings-container {
+        width: 100%;
+        max-width: 600px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+    }
+
+    .listing-card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .listing-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .listing-card img {
+        width: 100%;
+        height: 250px; /* Increased height to make the image slightly bigger vertically */
+        object-fit: cover; /* Ensures the image covers the container without distortion */
+        display: block;
+        border-radius: 8px;
+    }
+
+    .listing-card .info {
+        padding: 25px;
+    }
+
+    .listing-card h4 {
+        color: #2c3e50;
+        font-size: 1.7em;
+        margin-bottom: 15px;
+    }
+
+    .listing-card p {
+        color: #7f8c8d;
+        font-size: 1.1em;
+        margin-bottom: 15px;
+    }
+
+    .listing-card .price {
+        color: #2c3e50;
+        font-size: 1.3em;
+        font-weight: 600;
+    }
+
+    .button-group {
+    display: flex;
+    gap: 110px; /* Space between buttons */
+    margin-top: 10px;
+}
+
+    .delete-button, .update-button {
+    background-color: #e74c3c; /* override for delete only */
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.update-button {
+    background-color: #2c3e50;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+}
+
+.update-button:hover {
+    background-color: #34495e;
+}
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <h2>Makers BnB</h2>
+    </div>
+    <div class="nav-links">
+        <a href="/bookings">Bookings</a>
+        <a href="/requests">Requests</a>
+        <a href="/logout">Sign Out</a>
+    </div>
+</header>
+
+<section class="hero">
+    <a href="/listings" class="back-link">← Back to Listings</a>
+
+    <div class="intro-text">
+        <h1>Your Property Listings</h1>
+        <p>These are the listings you've created on Makers BnB.</p>
+    </div>
+
+    <div class="add-listing-button">
+        <a href="/new-listing">+ Add New Listing</a>
+    </div>
+
+    <div class="listings-container">
+        {% for listing in listings %}
+        <div class="listing-card">
+            <img src="{{ url_for('static', filename='uploads/' + listing.image) }}" alt="{{ listing.name }}" />
+            <div class="info">
+                <h4>{{ listing.name }}</h4>
+                <p>{{ listing.description }}</p>
+                <span class="price">£{{ listing.price }} / night</span>
+                <div class="button-group">
+                    <form action="/delete-listing/{{ listing.id }}" method="POST">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                    <a href="/edit-listing/{{ listing.id }}" class="update-button-link">
+                    <button type="button" class="update-button">Edit</button>
+                    </a>
+                    </form>
+                </div>   
+            </div>
+        </div>
+        {% else %}
+        <p style="color: white; font-size: 1.2em; margin-top: 20px;">You don't have any listings yet.</p>
+        {% endfor %}
+    </div>
+</section>
+
+</body>
+</html>
